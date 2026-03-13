@@ -1,149 +1,228 @@
-<!-- original : https://codepen.io/SeanNorton/pen/LWBXQL -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>greeting2</title>
-    <style>
-        /*CSS RESETS*/
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clock</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Share+Tech+Mono&family=Inter:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#0e0b08;--s1:#181310;--s2:#201a12;--s3:#2a2018;
+  --b1:#2e2318;--b2:#3e3228;--b3:#524030;
+  --t1:#f0e8dc;--t2:#d4c8b8;--t3:#9a8a78;--t4:#6a5a48;
+  --ac:#c4904f;--ac2:#e0b47a;--ac3:#f5d090;
+  --gr:#7aaa88;--bl:#6a9aaa;--pu:#9a7aaa;
+}
+html,body{height:100%;overflow:hidden;}
 body{
-    background-color: #191919;
-    line-height: 1.6;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;font-family:'Inter',sans-serif;
 }
-h1 {
-    margin-top: 0;
+body::after{
+  content:'';position:fixed;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.02) 2px,rgba(0,0,0,.02) 4px);
+  pointer-events:none;z-index:0;
 }
-/*CSS START*/
-.full-table {
-    display: table;
-    height: 100%;
-    width: 100%;
+.orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;}
+.o1{width:700px;height:700px;background:radial-gradient(circle at 30% 30%,rgba(196,144,79,.12),transparent 65%);top:-300px;right:-250px;animation:drift1 25s ease-in-out infinite;}
+.o2{width:500px;height:500px;background:radial-gradient(circle,rgba(154,122,170,.07),transparent 65%);bottom:-200px;left:-150px;animation:drift2 32s ease-in-out infinite;}
+.o3{width:300px;height:300px;background:radial-gradient(circle,rgba(106,154,170,.06),transparent 65%);top:20%;left:20%;animation:drift3 19s ease-in-out infinite;}
+@keyframes drift1{0%,100%{transform:translate(0,0) rotate(0deg)}33%{transform:translate(-30px,20px) rotate(5deg)}66%{transform:translate(15px,-25px) rotate(-3deg)}}
+@keyframes drift2{0%,100%{transform:translate(0,0)}50%{transform:translate(35px,-40px)}}
+@keyframes drift3{0%,100%{transform:translate(0,0) scale(1);opacity:.06}50%{transform:translate(20px,-15px) scale(1.1);opacity:.1}}
+
+/* BAR */
+.bar{
+  position:relative;z-index:2;
+  width:calc(100% - 24px);max-width:960px;
+  background:var(--s1);
+  border:1px solid var(--b1);
+  border-radius:3px;
+  display:grid;
+  grid-template-columns:auto 1fr auto auto auto;
+  align-items:stretch;
+  overflow:hidden;
+  animation:barIn .9s cubic-bezier(.16,1,.3,1) both;
 }
-.table-cell {
-    display: table-cell;
-    vertical-align: middle;
-    text-align: center;
+@keyframes barIn{from{opacity:0;transform:translateY(20px) scaleX(.96)}to{opacity:1;transform:translateY(0) scaleX(1)}}
+.bar::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(to right,transparent 0%,var(--ac) 20%,var(--ac2) 50%,var(--ac) 80%,transparent 100%);
+  animation:lineShimmer 4s ease-in-out infinite;
 }
-.card {
-    padding: 10px 25px 10px 25px;
-    border-radius: 10px;
-    background: #2f2f2f;
-    width: 85vw;
-    color: #e6e6e5;
-    display: inline-block;
-    box-shadow: 2px 2px 1px 0px #111111;
+@keyframes lineShimmer{0%,100%{opacity:.3}50%{opacity:.7}}
+.bar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(to right,transparent,var(--b3) 30%,var(--b3) 70%,transparent);}
+
+.seg{display:flex;flex-direction:column;justify-content:center;padding:16px 20px;position:relative;}
+.seg+.seg::before{
+  content:'';position:absolute;left:0;top:20%;height:60%;
+  width:1px;background:linear-gradient(to bottom,transparent,var(--b2) 30%,var(--b2) 70%,transparent);
 }
-.card:hover {
-    margin-top: 2px;
-    box-shadow: none;
+
+/* GREETING */
+.seg-greet{padding:16px 24px;}
+.greet-sub{font-family:'Cormorant Garamond',serif;font-size:10px;font-style:italic;font-weight:300;color:var(--t3);letter-spacing:.12em;margin-bottom:2px;animation:fadeSlide .6s .2s both;}
+.greet-name{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--t1);letter-spacing:.04em;line-height:1;text-shadow:0 0 30px rgba(196,144,79,.2);animation:fadeSlide .6s .3s both;}
+@keyframes fadeSlide{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+
+/* CLOCK */
+.seg-clock{padding:10px 28px;align-items:center;flex-direction:row;}
+.digits{display:flex;align-items:center;}
+.digit-group{display:flex;gap:1px;}
+.digit{
+  font-family:'Cormorant Garamond',serif;font-size:56px;font-weight:300;
+  color:var(--t1);line-height:1;letter-spacing:-.02em;overflow:hidden;
 }
-.clock {
-    display: inline;
-    font-family: 'Playfair Display', serif;
-    font-weight: 700;
-    font-size: 1.8em;
-    letter-spacing: 0.02em;
+.digit .roll{display:block;transition:transform .25s cubic-bezier(.16,1,.3,1),color .25s;}
+.digit.flip .roll{animation:digitFlip .28s cubic-bezier(.16,1,.3,1);color:var(--ac2);}
+@keyframes digitFlip{0%{transform:translateY(0) scaleY(1)}40%{transform:translateY(-6px) scaleY(.85);color:var(--ac3)}100%{transform:translateY(0) scaleY(1)}}
+.colon-sep{
+  font-family:'Cormorant Garamond',serif;font-size:46px;font-weight:200;
+  color:var(--ac);line-height:1;padding:0 3px;align-self:center;margin-bottom:2px;
+  animation:colonBlink 1s ease-in-out infinite;
 }
-.time {
-    display: inline;
-    min-width: 37px;
+@keyframes colonBlink{0%,100%{opacity:.5;transform:scaleY(1)}50%{opacity:.12;transform:scaleY(.85)}}
+
+/* SECONDS */
+.seg-secs{min-width:88px;align-items:center;}
+.secs-val{font-family:'Share Tech Mono',monospace;font-size:28px;color:var(--t2);letter-spacing:.04em;line-height:1;transition:color .1s;}
+.secs-val.tick{color:var(--ac2);}
+.ampm-badge{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:.22em;color:var(--ac);border:1px solid rgba(196,144,79,.25);border-radius:1px;padding:2px 6px;background:rgba(196,144,79,.06);margin-top:5px;}
+.secs-ring{margin-top:8px;}
+.secs-ring svg{transform:rotate(-90deg);}
+.ring-bg{fill:none;stroke:var(--b2);stroke-width:2;}
+.ring-fg{fill:none;stroke:var(--ac);stroke-width:2;stroke-linecap:round;transition:stroke-dashoffset .5s linear;}
+
+/* DATE */
+.seg-date{}
+.date-day{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:.28em;color:var(--ac);text-transform:uppercase;margin-bottom:3px;}
+.date-num{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--t1);line-height:1;}
+.date-month{font-family:'Cormorant Garamond',serif;font-size:11px;font-style:italic;color:var(--t3);letter-spacing:.06em;margin-top:1px;}
+
+/* STATS */
+.seg-stats{padding:14px 24px 14px 20px;gap:9px;}
+.stat{display:flex;align-items:center;gap:8px;}
+.stat-label{font-family:'Share Tech Mono',monospace;font-size:7px;letter-spacing:.2em;color:var(--t4);text-transform:uppercase;min-width:28px;}
+.stat-bar-wrap{flex:1;height:2px;background:var(--b2);border-radius:1px;overflow:hidden;min-width:70px;}
+.stat-bar-fill{height:100%;border-radius:1px;transition:width 1s cubic-bezier(.34,1.1,.64,1);}
+.stat-pct{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--ac2);min-width:28px;text-align:right;}
+
+/* LIVE DOT */
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--gr);position:absolute;top:10px;right:10px;animation:livePulse 2s ease-in-out infinite;}
+.live-dot::after{content:'';position:absolute;inset:-3px;border-radius:50%;border:1px solid var(--gr);opacity:.3;animation:livePulse 2s ease-in-out infinite .4s;}
+@keyframes livePulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.4}}
+
+/* MOBILE */
+@media(max-width:600px){
+  .bar{grid-template-columns:1fr 1fr;grid-template-rows:auto auto auto;}
+  .seg-greet{grid-column:1/2;}
+  .seg-date{grid-column:2/3;}
+  .seg-clock{grid-column:1/3;justify-content:center;padding:8px 16px;}
+  .seg-secs{grid-column:1/2;align-items:flex-start;}
+  .seg-stats{grid-column:2/3;}
+  .digit{font-size:40px;}
+  .colon-sep{font-size:34px;}
 }
-.colon {
-    font-size: 1.1em;
-    display: inline-block;
-    opacity: 0.35;
-}
-.date {
-    display: inline;
-    min-width: 162px;
-    font-family: 'Playfair Display', serif;
-    font-weight: 700;
-    font-size: 1.7em;
-    padding-right: 30px;
-    letter-spacing: 0.01em;
-}
-.greet{
-    display: inline;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 300;
-    font-size: 1.5rem;
-    padding-right: 30px;
-    letter-spacing: 0.01em;
-    opacity: 0.65;
-}
-    </style>
+</style>
 </head>
 <body>
+<div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
 
-<div class="full-table">
-  <div class="table-cell">
-    
-    <div class="card">
-        <div class="greet" id="greet"></div>
-      <div class="date" id="date"></div>
-      <div class="clock">
-        <div class="time" id="hour"></div>
-        <div class="colon">:</div>
-        <div class="time" id="min"></div>
-        <div class="colon">:</div>
-        <div class="time" id="sec"></div>
+<div class="bar">
+  <div class="live-dot"></div>
+
+  <div class="seg seg-greet">
+    <div class="greet-sub" id="greetSub">buenos días,</div>
+    <div class="greet-name">Alan</div>
+  </div>
+
+  <div class="seg seg-clock">
+    <div class="digits">
+      <div class="digit-group">
+        <div class="digit" id="d-h1"><span class="roll">0</span></div>
+        <div class="digit" id="d-h2"><span class="roll">0</span></div>
+      </div>
+      <div class="colon-sep">:</div>
+      <div class="digit-group">
+        <div class="digit" id="d-m1"><span class="roll">0</span></div>
+        <div class="digit" id="d-m2"><span class="roll">0</span></div>
       </div>
     </div>
-    
+  </div>
+
+  <div class="seg seg-secs">
+    <div class="secs-val" id="secsVal">00</div>
+    <div class="ampm-badge" id="ampmBadge">am</div>
+    <div class="secs-ring">
+      <svg width="36" height="36" viewBox="0 0 36 36">
+        <circle class="ring-bg" cx="18" cy="18" r="14"/>
+        <circle class="ring-fg" id="ringFg" cx="18" cy="18" r="14" stroke-dasharray="87.96" stroke-dashoffset="87.96"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="seg seg-date">
+    <div class="date-day" id="dateDay">—</div>
+    <div class="date-num" id="dateNum">—</div>
+    <div class="date-month" id="dateMonth">—</div>
+  </div>
+
+  <div class="seg seg-stats">
+    <div class="stat">
+      <div class="stat-label">año</div>
+      <div class="stat-bar-wrap"><div class="stat-bar-fill" id="barYear" style="background:linear-gradient(to right,var(--ac),var(--ac2));width:0%"></div></div>
+      <div class="stat-pct" id="pctYear">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">día</div>
+      <div class="stat-bar-wrap"><div class="stat-bar-fill" id="barDay" style="background:linear-gradient(to right,var(--bl),#8abccc);width:0%"></div></div>
+      <div class="stat-pct" id="pctDay">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">sem</div>
+      <div class="stat-bar-wrap"><div class="stat-bar-fill" id="barWeek" style="background:linear-gradient(to right,var(--pu),#b89acc);width:0%"></div></div>
+      <div class="stat-pct" id="pctWeek">—</div>
+    </div>
   </div>
 </div>
+
 <script>
-    function date() {
-var today = new Date();
-document.getElementById('date').innerHTML = today.toDateString();
+const DAYS=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const MONTHS=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const pad=n=>String(n).padStart(2,'0');
+function greet(h){return h<12?'buenos días,':h<19?'buenas tardes,':'buenas noches,';}
+function setDigit(id,ch){
+  const el=document.getElementById(id),roll=el.querySelector('.roll');
+  if(roll.textContent!==ch){roll.textContent=ch;el.classList.remove('flip');void el.offsetWidth;el.classList.add('flip');setTimeout(()=>el.classList.remove('flip'),300);}
 }
-function clock() {
-var today = new Date();
-var hour = zeros(twelveHour(today.getHours()));
-var minutes = zeros(today.getMinutes());
-var seconds = zeros(today.getSeconds());
-if(today.getHours() >=12){
-    seconds+=" pm"
+let prevSec=-1;
+function tick(){
+  const now=new Date();
+  const h=now.getHours(),m=now.getMinutes(),s=now.getSeconds();
+  document.getElementById('greetSub').textContent=greet(h);
+  const hS=pad(h),mS=pad(m);
+  setDigit('d-h1',hS[0]);setDigit('d-h2',hS[1]);
+  setDigit('d-m1',mS[0]);setDigit('d-m2',mS[1]);
+  const sv=document.getElementById('secsVal');
+  if(s!==prevSec){sv.textContent=pad(s);sv.classList.add('tick');setTimeout(()=>sv.classList.remove('tick'),150);prevSec=s;}
+  document.getElementById('ringFg').style.strokeDashoffset=87.96-(s/59*87.96);
+  document.getElementById('ampmBadge').textContent=h>=12?'pm':'am';
+  document.getElementById('dateDay').textContent=DAYS[now.getDay()];
+  document.getElementById('dateNum').textContent=now.getDate();
+  document.getElementById('dateMonth').textContent=MONTHS[now.getMonth()];
+  const yr=now.getFullYear(),start=new Date(yr,0,1),end=new Date(yr+1,0,1);
+  const yp=Math.round((now-start)/(end-start)*100);
+  const dp=Math.round((h*3600+m*60+s)/86400*100);
+  const dow=now.getDay(),secsWeek=(dow===0?6:dow-1)*86400+h*3600+m*60+s;
+  const wp=Math.round(secsWeek/(7*86400)*100);
+  document.getElementById('barYear').style.width=yp+'%';document.getElementById('pctYear').textContent=yp+'%';
+  document.getElementById('barDay').style.width=dp+'%';document.getElementById('pctDay').textContent=dp+'%';
+  document.getElementById('barWeek').style.width=wp+'%';document.getElementById('pctWeek').textContent=wp+'%';
 }
-else{
-    seconds+=" am"
-}
-hrs = today.getHours();
-if (hrs < 12)
-        greet = 'Good Morning, Alan  ';
-    else if (hrs >= 12 && hrs <= 17)
-        greet = 'Good Afternoon, Alan ';
-    else if (hrs >= 17 && hrs <= 24)
-        greet = 'Good Evening, Alan  ';
-document.getElementById('greet').innerHTML = greet;
-document.getElementById('hour').innerHTML = hour;
-document.getElementById('min').innerHTML = minutes;
-document.getElementById('sec').innerHTML = seconds;
-}
-function twelveHour(hour) {
-if (hour > 12) {
-    return hour -= 12 
-} else if (hour === 0) {
-    return hour = 12;
-} else {
-    return hour
-}
-}
-    
-function zeros(num) {
-if (num < 10) {
-    num = '0' + num
-};
-return num;
-}
-function dateTime() {
-date();
-clock();
-setTimeout(dateTime, 500);
-}
-dateTime()
+tick();setInterval(tick,500);
 </script>
 </body>
 </html>
